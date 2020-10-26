@@ -1,5 +1,5 @@
 # Server description
-##Sonarcloud
+## Sonarcloud
 
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=Pharma-collect_Server&metric=bugs)](https://sonarcloud.io/dashboard?id=Pharma-collect_Server)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Pharma-collect_Server&metric=security_rating)](https://sonarcloud.io/dashboard?id=Pharma-collect_Server)
