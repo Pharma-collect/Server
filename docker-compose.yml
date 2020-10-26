@@ -22,7 +22,6 @@ services:
       - 6443:443
     volumes:
       - /home/ph-admin/PharmaCollect/phpmyadmin_data/config.inc.php:/etc/phpmyadmin/config.inc.php
-      - /home/ph-admin/PharmaCollect/phpmyadmin_data/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
       - /home/ph-admin/PharmaCollect/phpmyadmin_data/cert:/etc/ssl/phpmyadmin
       - /home/ph-admin/PharmaCollect/phpmyadmin_data/000-default.conf:/etc/apache2/sites-available/000-default.conf
       - /home/ph-admin/PharmaCollect/phpmyadmin_data/log:/var/log/apache2/
