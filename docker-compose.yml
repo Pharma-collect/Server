@@ -8,10 +8,10 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_RANDOM_ROOT_PASSWORD: "yes"
-      MYSQL_USER: dev-pharmacollect
-      MYSQL_PASSWORD: BEisen2020
     volumes:
       - /home/ph-admin/PharmaCollect/mariadb_data:/var/lib/mysql
+      - /home/ph-admin/PharmaCollect/mariadb_config/ssl:/etc/ssl/mariadb
+      - /home/ph-admin/PharmaCollect/mariadb_config/my.cnf:/etc/mysql/my.cnf
     ports:
       - 3306:3306    
   
@@ -22,7 +22,16 @@ services:
       - 6443:443
     volumes:
       - /home/ph-admin/PharmaCollect/phpmyadmin_data/config.inc.php:/etc/phpmyadmin/config.inc.php
+      - /home/ph-admin/PharmaCollect/phpmyadmin_data/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
       - /home/ph-admin/PharmaCollect/phpmyadmin_data/cert:/etc/ssl/phpmyadmin
       - /home/ph-admin/PharmaCollect/phpmyadmin_data/000-default.conf:/etc/apache2/sites-available/000-default.conf
       - /home/ph-admin/PharmaCollect/phpmyadmin_data/log:/var/log/apache2/
 
+  jenkins:
+    image: jenkins/jenkins
+    restart: always
+    volumes:
+      - /home/ph-admin/PharmaCollect/jenkins_data:/var/jenkins_home
+    ports:
+      - 8080:8080
+      - 50000:50000
