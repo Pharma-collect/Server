@@ -27,11 +27,28 @@ services:
       - /home/ph-admin/PharmaCollect/phpmyadmin_data/000-default.conf:/etc/apache2/sites-available/000-default.conf
       - /home/ph-admin/PharmaCollect/phpmyadmin_data/log:/var/log/apache2/
 
-  jenkins:
-    image: jenkins/jenkins
+  node:
+    image: pharmacollect/node:latest
     restart: always
-    volumes:
-      - /home/ph-admin/PharmaCollect/jenkins_data:/var/jenkins_home
     ports:
-      - 8080:8080
-      - 50000:50000
+      - 8082:3000
+
+  reverse-proxy:
+    # The official v2 Traefik docker image
+    image: traefik:v2.3
+    # Enables the web UI and tells Traefik to listen to docker
+    command: --api.insecure=true --providers.docker
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8081:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+    
+    labels:
+      - "traefik.http.routers.dashboard.rule=Host(`pharmacollect.freeboxos.fr`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.middlewares=auth"
+      - "traefik.http.middlewares.auth.basicauth.users=test:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/,test2:$$apr1$$d9hr9HBB$$4HxwgUir3HP4EsggP/QNo0"
