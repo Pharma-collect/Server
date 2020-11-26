@@ -27,12 +27,26 @@ services:
       - /home/ph-admin/PharmaCollect/phpmyadmin_data/000-default.conf:/etc/apache2/sites-available/000-default.conf
       - /home/ph-admin/PharmaCollect/phpmyadmin_data/log:/var/log/apache2/
 
-  node:
+  node-http:
     image: pharmacollect/node:latest
     restart: always
     ports:
       - 8082:3000
+    labels:
+      - "traefik.http.routers.node.rule=Host(`nodehttp.docker.localhost`)"
+    command: node /usr/src/app/server.js
 
+  node-https:
+    image: pharmacollect/node:latest
+    restart: always
+    ports:
+      - 8083:3000
+    volumes:
+      - /home/ph-admin/PharmaCollect/cert:/etc/ssl
+    labels:
+      - "traefik.http.routers.node.rule=Host(`nodehttps.docker.localhost`)"
+    command: node /usr/src/app/server_https.js
+  
   reverse-proxy:
     # The official v2 Traefik docker image
     image: traefik:v2.3
