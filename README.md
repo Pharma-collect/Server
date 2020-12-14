@@ -6,11 +6,13 @@
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Pharma-collect_Server&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=Pharma-collect_Server)
 
 # Architecture
-![web](https://raw.githubusercontent.com/Pharma-collect/Server/main/img/server.jpeg)
+![web](https://raw.githubusercontent.com/Pharma-collect/Server/main/img/server.png)
 # Description
 ## Data Flow
 ### Traefik
 Traefik is a reverse-proxy and load balancer, this mean all requests are redirected to the corresponding service, requests are redirected to the least used instance to allow better management of resources
+
+![web](https://raw.githubusercontent.com/Pharma-collect/Server/main/img/traefik_dashboard.png)
 
 For more details, go to their [websites](https://doc.traefik.io/traefik/)
 ### Laravel
@@ -56,6 +58,10 @@ Status: pending
 
 Sonarcloud is the Static Analysis Secure Tool use in the entire project, he catch all vulnerabilities and help with the code quality
 
+### Screenshot
+![web](https://raw.githubusercontent.com/Pharma-collect/Server/main/img/sonar.png)
+    
+
 ### Suricata
 
 Suricata is a free and open source, mature, fast and robust network threat detection engine.
@@ -68,7 +74,10 @@ For more details, go to their [websites](https://suricata-ids.org/)
 
 ### TLS and SSL
 
-All requests are secure, we use https protocol, **SHA-256** with **RSA 4096** Encryption, 
+All requests are secure, we use https protocol.
+For this project, we used a Let's Encrypt wildcard certificates provided by a Custom DNS named Traefik.me
+
+
 
 # Get the environment 
 
@@ -93,5 +102,4 @@ All Docker images used in this project are available in [Dockerhub](https://hub.
  - pharmacollect/node
  - pharmacolelct/phpmyadmin
  - pharmacollect/mariadb
-
 
