@@ -51,7 +51,11 @@ for more details, go to their [websites](https://www.jenkins.io/)
 
 Tools: Prometheus, Grafana
 
-Status: pending
+Traefik expose some prometheus metrics that Grafana use to craft some dashboard
+
+### Traefik dashboard
+![web](https://raw.githubusercontent.com/Pharma-collect/Server/main/img/grafana.png)
+
 
 ## Cybersecurity
 ### Sonarcloud
