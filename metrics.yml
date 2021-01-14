@@ -1,0 +1,62 @@
+version: '3.1'
+
+services:
+
+  prometheus:
+      image: quay.io/prometheus/prometheus:v2.0.0
+      restart: always
+      container_name: prometheus
+      command: "--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus"
+      #networks:
+      # - metrics
+      volumes:
+        - ${PWD}/prometheus_config/prometheus.yml:/etc/prometheus/prometheus.yml
+        - prom_data:/prometheus
+      labels:
+        - "traefik.http.routers.prometheus.rule=Host(`prometheus`)"
+        - "traefik.http.routers.prometheus.entrypoints=http"
+        - "traefik.http.routers.prometheus.middlewares=authentication"
+        - "traefik.http.middlewares.authentication.basicauth.users=admin:$$apr1$$Phdgn0kW$$UINd62pjhA3IupprolVWP0"
+    
+  grafana:
+    image: grafana/grafana:latest
+    restart: always
+    container_name: grafana
+    #networks:
+    #  - metrics
+    ports:
+      - ${GRAFANA_DASHBOARD_PORT}:3000
+    depends_on:
+      - prometheus
+    volumes:
+      - graf_data:/var/lib/grafana/
+      - graf:/etc/grafana/provisioning/
+    labels:
+      - "traefik.http.routers.grafana.rule=Host(`grafana`)"
+      - "traefik.http.routers.grafana.entrypoints=http"
+      - "traefik.http.routers.grafana.middlewares=authentication"
+      - "traefik.http.middlewares.authentication.basicauth.users=admin:$$apr1$$Phdgn0kW$$UINd62pjhA3IupprolVWP0"
+
+    
+volumes:
+  certs:
+  prom_data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${PWD}/prometheus_data
+
+  graf_data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${PWD}/grafana_data
+  
+  graf:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${PWD}/grafana_config

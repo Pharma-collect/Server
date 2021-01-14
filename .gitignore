@@ -1,0 +1,8 @@
+mariadb_data
+prometheus_data
+traefik_data
+grafana_data
+files
+.env
+phpmyadmin_config/cert
+phpmyadmin_config/log

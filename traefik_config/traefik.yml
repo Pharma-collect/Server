@@ -5,6 +5,12 @@ log:
 
 accessLog:
   filePath: "/var/log/access.log"
+  fields:
+    defaultMode: keep
+    names:
+      StartUTC: drop
+    headers:
+      defaultMode: keep
 
 api:
   insecure: true

@@ -1,0 +1,154 @@
+version: '3.1'
+
+services:
+
+  db:
+    image: pharmacollect/mariadb:v0.0.1
+    restart: always
+    container_name: db
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_USER: ${MYSQL_USERNAME}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    #networks:
+    # - backend    
+    ports:
+      - 3306:3306
+    volumes:
+      - ${PWD}/mariadb_data:/var/lib/mysql
+      - ${PWD}/mariadb_config/ssl:/etc/ssl/mariadb
+      - ${PWD}/mariadb_config/my.cnf:/etc/mysql/my.cnf
+    labels:
+      - "traefik.enable=false"
+  
+#  phpmyadmin:
+#    image: pharmacollect/phpmyadmin:v0.0.1
+#    restart: always
+#    ports:
+#      - 6443:443
+#    volumes:
+#      - ${PWD}/phpmyadmin_data/config.inc.php:/etc/phpmyadmin/config.inc.php
+#      - ${PWD}/phpmyadmin_data/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
+#      - ${PWD}/phpmyadmin_data/cert:/etc/ssl/phpmyadmin
+#      - ${PWD}/phpmyadmin_data/000-default.conf:/etc/apache2/sites-available/000-default.conf
+#      - ${PWD}/phpmyadmin_data/log:/var/log/apache2/
+  
+  node:
+    image: pharmacollect/node:latest
+    restart: always
+    command:  node /usr/src/app/server.js
+    environment:
+      - NODE_ENV=production
+    #networks:
+    # - backend
+    # - frontend 
+    deploy:
+      replicas: ${NODE_REPLICAS}
+    depends_on:
+      - db
+      - reverse-proxy
+    volumes:
+      - ${PWD}/files:/usr/src/app/uploads
+    labels:
+      - "traefik.http.routers.node.rule=Host(`node`) || PathPrefix(`/api`)"
+      - "traefik.http.routers.node.entrypoints=http, https"
+      - "traefik.http.routers.node-tls.tls.domains[0].main=node.traefik.me"
+      - "traefik.http.routers.node-tls.tls.domains[0].sans=node-*.traefik.me"
+      - "traefik.http.routers.node-tls.entrypoints=https"
+      - "traefik.http.routers.node.tls=true"
+  
+  payment:
+    image: pharmacollect/payment:latest
+    restart: always
+    command: "node app.js"
+    #networks:
+    # - pay
+    deploy:
+      replicas: ${PAYMENT_REPLICAS}
+    depends_on:
+      - node
+    labels:
+      - "traefik.http.routers.payment.rule=Host(`payment`)"
+      - "traefik.http.routers.payment.entrypoints=http, https"
+      - "traefik.http.routers.payment-tls.tls.domains[0].main=payment.traefik.me"
+      - "traefik.http.routers.payment-tls.tls.domains[0].sans=payment-*.traefik.me"
+      - "traefik.http.routers.payment-tls.entrypoints=https"
+      - "traefik.http.routers.payment.tls=true"
+
+  webbackoffice:
+    image: pharmacollect/webbo:latest
+    restart: always
+    #networks:
+    # - frontend 
+    deploy:
+      replicas: ${WEBBACKOFFICE_REPLICAS}
+    depends_on:
+      - node
+    labels:
+      - "traefik.http.routers.webbo.rule=PathPrefix(`/admin`) || PathPrefix(`/assets`)"
+      - "traefik.http.routers.webbo.entrypoints=http, https"
+      - "traefik.http.routers.webbo-tls.tls.domains[0].main=webfr.traefik.me"
+      - "traefik.http.routers.webbo-tls.tls.domains[0].sans=webfr-*.traefik.me"
+      - "traefik.http.routers.webbo-tls.entrypoints=https"
+      - "traefik.http.routers.webbo.tls=true"
+
+  webfront:
+    image: pharmacollect/webfr:latest
+    restart: always
+    #networks:
+    # - frontend
+    deploy:
+      replicas: ${WEBFRONTEND_REPLICAS}
+    depends_on:
+      - node
+    labels:
+      - "traefik.http.routers.webfr.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.webfr.entrypoints=http, https"
+      - "traefik.http.routers.webfr-tls.tls.domains[0].main=webfr.traefik.me"
+      - "traefik.http.routers.webfr-tls.tls.domains[0].sans=webfr-*.traefik.me"
+      - "traefik.http.routers.webfr-tls.entrypoints=https"
+      - "traefik.http.routers.webfr.tls=true"
+
+  reverse-proxy:
+    image: traefik:v2.3
+    restart: unless-stopped
+    container_name: rproxy
+    command: --api.insecure=true --providers.docker
+    environment:
+      - "TZ=Europe/Paris"
+    #networks:
+    # - frontend
+    # - pay
+    # - metrics
+    ports:
+      - "80:80"
+      - "443:443"
+      - "${TRAEFIK_DASHBOARD_PORT}:8080"
+      - "${TRAEFIK_METRICS_PORT}:8082"
+    volumes:
+      - ${PWD}/traefik_config/traefik.yml:/etc/traefik/traefik.yml
+      - ${PWD}/traefik_config/tls.yml:/etc/traefik/tls.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+      - certs:/etc/ssl/traefik
+      - ${PWD}/traefik_data/logtraefik:/var/log
+    labels:
+      - "traefik.enable=false"
+
+  reverse-proxy-https-helper:
+    image: alpine
+    container_name: rproxy_helper
+    command: sh -c "cd /etc/ssl/traefik
+      && wget traefik.me/cert.pem -O cert.pem
+      && wget traefik.me/privkey.pem -O privkey.pem"
+    volumes:
+      - certs:/etc/ssl/traefik
+
+networks:
+  frontend:
+  backend:
+  metrics:
+  pay:
+
+volumes:
+  certs:
