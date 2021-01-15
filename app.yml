@@ -14,7 +14,7 @@ services:
     #networks:
     # - backend    
     ports:
-      - 3306:3306
+      - ${MYSQL_DATA_PORT}:3306
     volumes:
       - ${PWD}/mariadb_data:/var/lib/mysql
       - ${PWD}/mariadb_config/ssl:/etc/ssl/mariadb
