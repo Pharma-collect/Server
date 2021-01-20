@@ -3,22 +3,24 @@ version: '3.1'
 services:
 
   db:
-    image: pharmacollect/mariadb:v0.0.1
+    image: pharmacollect/mariadb:latest
     restart: always
     container_name: db
     command: --default-authentication-plugin=mysql_native_password
     environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USERNAME}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    #networks:
-    # - backend    
+    networks:
+     - backend    
     ports:
       - ${MYSQL_DATA_PORT}:3306
     volumes:
       - ${PWD}/mariadb_data:/var/lib/mysql
       - ${PWD}/mariadb_config/ssl:/etc/ssl/mariadb
       - ${PWD}/mariadb_config/my.cnf:/etc/mysql/my.cnf
+      - ${PWD}/mariadb_config/init.sql:/docker-entrypoint-initdb.d/init.sql
     labels:
       - "traefik.enable=false"
   
@@ -40,9 +42,9 @@ services:
     command:  node /usr/src/app/server.js
     environment:
       - NODE_ENV=production
-    #networks:
-    # - backend
-    # - frontend 
+    networks:
+     - backend
+     - frontend 
     deploy:
       replicas: ${NODE_REPLICAS}
     depends_on:
@@ -62,8 +64,8 @@ services:
     image: pharmacollect/payment:latest
     restart: always
     command: "node app.js"
-    #networks:
-    # - pay
+    networks:
+     - pay
     deploy:
       replicas: ${PAYMENT_REPLICAS}
     depends_on:
@@ -79,8 +81,8 @@ services:
   webbackoffice:
     image: pharmacollect/webbo:latest
     restart: always
-    #networks:
-    # - frontend 
+    networks:
+     - frontend 
     deploy:
       replicas: ${WEBBACKOFFICE_REPLICAS}
     depends_on:
@@ -96,8 +98,8 @@ services:
   webfront:
     image: pharmacollect/webfr:latest
     restart: always
-    #networks:
-    # - frontend
+    networks:
+     - frontend
     deploy:
       replicas: ${WEBFRONTEND_REPLICAS}
     depends_on:
@@ -117,10 +119,11 @@ services:
     command: --api.insecure=true --providers.docker
     environment:
       - "TZ=Europe/Paris"
-    #networks:
-    # - frontend
-    # - pay
-    # - metrics
+    networks:
+     - frontend
+     - pay
+     - metrics
+     - backend
     ports:
       - "80:80"
       - "443:443"

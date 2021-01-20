@@ -125,7 +125,7 @@ Then run the following command:
     
     cd Server
 
-    cp .env-example .env
+    cp .env-example .env  ##You should change default password on .env and mariadb_config/init.sql files
 
     docker-compose -f app.yml up -d
 
