@@ -17,10 +17,10 @@ services:
     ports:
       - ${MYSQL_DATA_PORT}:3306
     volumes:
-      - ${PWD}/mariadb_data:/var/lib/mysql
-      - ${PWD}/mariadb_config/ssl:/etc/ssl/mariadb
-      - ${PWD}/mariadb_config/my.cnf:/etc/mysql/my.cnf
-      - ${PWD}/mariadb_config/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ${PATH_DIR}/mariadb_data:/var/lib/mysql
+      - ${PATH_DIR}/mariadb_config/ssl:/etc/ssl/mariadb
+      - ${PATH_DIR}/mariadb_config/my.cnf:/etc/mysql/my.cnf
+      - ${PATH_DIR}/mariadb_config/init.sql:/docker-entrypoint-initdb.d/init.sql
     labels:
       - "traefik.enable=false"
   
@@ -30,11 +30,10 @@ services:
 #    ports:
 #      - 6443:443
 #    volumes:
-#      - ${PWD}/phpmyadmin_data/config.inc.php:/etc/phpmyadmin/config.inc.php
-#      - ${PWD}/phpmyadmin_data/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
-#      - ${PWD}/phpmyadmin_data/cert:/etc/ssl/phpmyadmin
-#      - ${PWD}/phpmyadmin_data/000-default.conf:/etc/apache2/sites-available/000-default.conf
-#      - ${PWD}/phpmyadmin_data/log:/var/log/apache2/
+#      - ${PATH_DIR}/phpmyadmin_config/config.inc.php:/etc/phpmyadmin/config.inc.php
+#      - ${PATH_DIR}/phpmyadmin_config/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
+#      - ${PATH_DIR}/phpmyadmin_config/000-default.conf:/etc/apache2/sites-available/000-default.conf
+#      - ${PATH_DIR}/phpmyadmin_config/log:/var/log/apache2/
   
   node:
     image: pharmacollect/node:latest
@@ -51,7 +50,7 @@ services:
       - db
       - reverse-proxy
     volumes:
-      - ${PWD}/files:/usr/src/app/uploads
+      - ${PATH_DIR}/files:/usr/src/app/uploads
     labels:
       - "traefik.http.routers.node.rule=Host(`node`) || PathPrefix(`/api`)"
       - "traefik.http.routers.node.entrypoints=http, https"
@@ -130,11 +129,11 @@ services:
       - "${TRAEFIK_DASHBOARD_PORT}:8080"
       - "${TRAEFIK_METRICS_PORT}:8082"
     volumes:
-      - ${PWD}/traefik_config/traefik.yml:/etc/traefik/traefik.yml
-      - ${PWD}/traefik_config/tls.yml:/etc/traefik/tls.yml
+      - ${PATH_DIR}/traefik_config/traefik.yml:/etc/traefik/traefik.yml
+      - ${PATH_DIR}/traefik_config/tls.yml:/etc/traefik/tls.yml
       - /var/run/docker.sock:/var/run/docker.sock
       - certs:/etc/ssl/traefik
-      - ${PWD}/traefik_data/logtraefik:/var/log
+      - ${PATH_DIR}/traefik_data/logtraefik:/var/log
     labels:
       - "traefik.enable=false"
 

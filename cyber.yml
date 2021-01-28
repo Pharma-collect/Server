@@ -6,6 +6,11 @@ services:
     image: wazuh/wazuh-odfe:4.0.3_1.11.0
     hostname: wazuh-manager
     restart: always
+    networks:
+     - server_frontend
+     - server_pay
+     - server_metrics
+     - server_backend
     ports:
       - "1514:1514"
       - "1515:1515"
@@ -33,6 +38,11 @@ services:
     image: amazon/opendistro-for-elasticsearch:1.11.0
     hostname: elasticsearch
     restart: always
+    networks:
+     - server_frontend
+     - server_pay
+     - server_metrics
+     - server_backend
     ports:
       - "${ELASTICSEARCH_DATA_PORT}:9200"
     environment:
@@ -53,6 +63,11 @@ services:
     image: wazuh/wazuh-kibana-odfe:4.0.3_1.11.0
     hostname: kibana
     restart: always
+    networks:
+     - server_frontend
+     - server_pay
+     - server_metrics
+     - server_backend
     ports:
       - ${KIBANA_DASHBOARD_PORT}:5601
     environment:
@@ -79,3 +94,13 @@ volumes:
   ossec_wodles:
   filebeat_etc:
   filebeat_var:
+
+networks:
+  server_frontend:
+    external: true
+  server_backend:
+    external: true
+  server_metrics:
+    external: true
+  server_pay:
+    external: true
