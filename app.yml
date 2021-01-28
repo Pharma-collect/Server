@@ -32,6 +32,7 @@ services:
 #    volumes:
 #      - ${PATH_DIR}/phpmyadmin_config/config.inc.php:/etc/phpmyadmin/config.inc.php
 #      - ${PATH_DIR}/phpmyadmin_config/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
+#      - ${PATH_DIR}/phpmyadmin_config/cert:/etc/ssl/phpmyadmin
 #      - ${PATH_DIR}/phpmyadmin_config/000-default.conf:/etc/apache2/sites-available/000-default.conf
 #      - ${PATH_DIR}/phpmyadmin_config/log:/var/log/apache2/
   
