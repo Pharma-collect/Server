@@ -27,8 +27,12 @@ services:
 #  phpmyadmin:
 #    image: pharmacollect/phpmyadmin:v0.0.1
 #    restart: always
+#    environment:
+#      - PMA_ARBITRARY=1
+#    networks:
+#      - backend
 #    ports:
-#      - 6443:443
+#      - ${PHPMYADMIN_PORT}:443
 #    volumes:
 #      - ${PATH_DIR}/phpmyadmin_config/config.inc.php:/etc/phpmyadmin/config.inc.php
 #      - ${PATH_DIR}/phpmyadmin_config/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php
