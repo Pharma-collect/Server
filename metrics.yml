@@ -7,10 +7,10 @@ services:
       restart: always
       container_name: prometheus
       command: "--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus"
-      #networks:
-      # - metrics
+      networks:
+       - server_metrics
       volumes:
-        - ${PWD}/prometheus_config/prometheus.yml:/etc/prometheus/prometheus.yml
+        - ${PATH_DIR}/prometheus_config/prometheus.yml:/etc/prometheus/prometheus.yml
         - prom_data:/prometheus
       labels:
         - "traefik.http.routers.prometheus.rule=Host(`prometheus`)"
@@ -22,8 +22,8 @@ services:
     image: grafana/grafana:latest
     restart: always
     container_name: grafana
-    #networks:
-    #  - metrics
+    networks:
+      - server_metrics
     ports:
       - ${GRAFANA_DASHBOARD_PORT}:3000
     depends_on:
@@ -37,6 +37,9 @@ services:
       - "traefik.http.routers.grafana.middlewares=authentication"
       - "traefik.http.middlewares.authentication.basicauth.users=admin:$$apr1$$Phdgn0kW$$UINd62pjhA3IupprolVWP0"
 
+networks:
+  server_metrics:
+    external: true
     
 volumes:
   certs:
@@ -45,18 +48,18 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: ${PWD}/prometheus_data
+      device: ${PATH_DIR}/prometheus_data
 
   graf_data:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: ${PWD}/grafana_data
+      device: ${PATH_DIR}/grafana_data
   
   graf:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: ${PWD}/grafana_config
+      device: ${PATH_DIR}/grafana_config

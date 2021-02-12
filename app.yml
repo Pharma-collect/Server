@@ -46,6 +46,9 @@ services:
     command:  node /usr/src/app/server.js
     environment:
       - NODE_ENV=production
+      - MAIL_USER=${MAIL_USER_DOCKER}
+      - MAIL_PASSWORD=${MAIL_PASSWORD_DOCKER}
+
     networks:
      - backend
      - frontend 
